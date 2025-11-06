@@ -2,11 +2,125 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mi sitio en GitHub Pages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SNAKE - Repositorio de Scripts</title>
+  <style>
+    body {
+      background-color: #0a0a0a;
+      color: #e0e0e0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #111;
+      padding: 1em 2em;
+      border-bottom: 2px solid #00ff88;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      color: #00ff88;
+      font-size: 1.8em;
+      margin: 0;
+    }
+    main {
+      padding: 2em;
+      max-width: 800px;
+      margin: auto;
+    }
+    .script-list {
+      margin-top: 2em;
+    }
+    .item {
+      background: #1b1b1b;
+      padding: 1em;
+      margin-bottom: 0.8em;
+      border-radius: 8px;
+      border: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .item:hover {
+      background: #222;
+    }
+    a {
+      color: #00e0ff;
+      text-decoration: none;
+      word-break: break-all;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .loading {
+      color: #888;
+      font-style: italic;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #777;
+      margin: 3em 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>¡Hola desde GitHub Pages!</h1>
-  <p>Mi sitio nuevo publicado con GitHub Pages.</p>
+  <header>
+    <h1>🐍 SNAKE</h1>
+    <span>Repositorio de Scripts</span>
+  </header>
+
+  <main>
+    <p>Descarga tus scripts directamente desde este sitio. Se listan automáticamente desde la carpeta <code>/scripts</code> del repositorio.</p>
+    
+    <div id="scriptList" class="script-list">
+      <p class="loading">Cargando lista de scripts...</p>
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Sergio San Martín — Publicado en GitHub Pages
+  </footer>
+
+  <script>
+    const repoOwner = "sinister1977";
+    const repoName = "sitioweb";
+    const folderPath = "scripts";
+    const listElement = document.getElementById("scriptList");
+
+    async function cargarScripts() {
+      try {
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}`;
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Error al obtener la lista de scripts");
+        const data = await response.json();
+
+        const scripts = data.filter(f => !f.type || f.type === "file");
+        if (scripts.length === 0) {
+          listElement.innerHTML = "<p>No hay scripts disponibles aún.</p>";
+          return;
+        }
+
+        listElement.innerHTML = "";
+        scripts.forEach(file => {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <span>${file.name}</span>
+            <a href="${file.download_url}" download>⬇️ Descargar</a>
+          `;
+          listElement.appendChild(div);
+        });
+      } catch (err) {
+        listElement.innerHTML = "<p style='color:#f55;'>Error al cargar los scripts.</p>";
+        console.error(err);
+      }
+    }
+
+    cargarScripts();
+  </script>
 </body>
 </html>
